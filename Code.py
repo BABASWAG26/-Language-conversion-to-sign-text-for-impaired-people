@@ -4,15 +4,12 @@ import speech_recognition as sr
 import mediapipe as mp
 import os
 
-# Initialize text-to-speech engine
 tts_engine = pyttsx3.init()
 
-# Initialize MediaPipe for hand recognition
 mp_hands = mp.solutions.hands
 hands = mp_hands.Hands(static_image_mode=False, max_num_hands=1, min_detection_confidence=0.7)
 mp_drawing = mp.solutions.drawing_utils
 
-# Dictionary mapping text to sign language images
 sign_dict = {
     'hello': 'sign_images/hello.png',
     'thank': 'sign_images/thank.png',
@@ -26,7 +23,6 @@ sign_dict = {
     'friend': 'sign_images/friend.png',
 }
 
-# Function to set the language for TTS
 def set_tts_language(language_code):
     voices = tts_engine.getProperty('voices')
     for voice in voices:
@@ -34,13 +30,11 @@ def set_tts_language(language_code):
             tts_engine.setProperty('voice', voice.id)
             break
 
-# Function to convert text to speech with language selection
 def text_to_speech(text, language_code='en'):
     set_tts_language(language_code)
     tts_engine.say(text)
     tts_engine.runAndWait()
 
-# Function to convert text to sign language images
 def text_to_sign(text):
     words = text.lower().split()
     for word in words:
@@ -49,14 +43,13 @@ def text_to_sign(text):
             img = cv2.imread(img_path)
             if img is not None:
                 cv2.imshow("Sign Language", img)
-                cv2.waitKey(1000)  # Display each image for 1 second
+                cv2.waitKey(1000)  
             else:
                 print(f"Image for '{word}' not found.")
         else:
             print(f"Sign for '{word}' not available.")
     cv2.destroyAllWindows()
 
-# Function for voice recognition with language selection
 def voice_to_text(language_code='en-IN'):
     recognizer = sr.Recognizer()
     with sr.Microphone() as source:
@@ -73,7 +66,6 @@ def voice_to_text(language_code='en-IN'):
             print("Request to Google Speech API failed.")
     return ""
 
-# Function to recognize hand gestures using the camera
 def recognize_hand_gesture():
     cap = cv2.VideoCapture(0)
     while cap.isOpened():
@@ -81,7 +73,6 @@ def recognize_hand_gesture():
         if not ret:
             break
         frame = cv2.flip(frame, 1)
-        # Convert the frame to RGB for MediaPipe processing
         rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         results = hands.process(rgb_frame)
 
@@ -89,25 +80,20 @@ def recognize_hand_gesture():
             for hand_landmarks in results.multi_hand_landmarks:
                 mp_drawing.draw_landmarks(frame, hand_landmarks, mp_hands.HAND_CONNECTIONS)
                 
-                # Custom logic for detecting specific gestures
                 thumb_tip = hand_landmarks.landmark[mp_hands.HandLandmark.THUMB_TIP]
                 index_tip = hand_landmarks.landmark[mp_hands.HandLandmark.INDEX_FINGER_TIP]
                 
-                # Example gesture: Thumb and index finger close together could mean "thank you"
                 if abs(thumb_tip.x - index_tip.x) < 0.05 and abs(thumb_tip.y - index_tip.y) < 0.05:
-                    text_to_sign("thank")  # Displays the "thank" sign image
-                    text_to_speech("Thank you")  # Says "Thank you"
+                    text_to_sign("thank")  
+                    text_to_speech("Thank you")  
                 
-                # Example gesture: Open hand for "hello"
-                # (You would add specific conditions based on landmarks for different gestures)
 
         cv2.imshow("Hand Gesture Recognition", frame)
-        if cv2.waitKey(5) & 0xFF == 27:  # Press 'Esc' key to exit
+        if cv2.waitKey(5) & 0xFF == 27:  
             break
     cap.release()
     cv2.destroyAllWindows()
 
-# Main program to handle voice and gesture inputs
 def main():
     print("Choose an option:")
     print("1. Voice command to Text and Sign Language")
@@ -116,11 +102,9 @@ def main():
 
     choice = input("Enter choice (1/2/3): ")
 
-    # Ask the user for the language selection
     print("Choose a language (en, hi, ta, te, kn, ml, bn): ")
     language = input("Enter language code: ")
 
-    # Mapping common Indian languages to their language codes for recognition
     language_mapping = {
         'en': 'en-IN',  # English (India)
         'hi': 'hi-IN',  # Hindi
@@ -131,7 +115,6 @@ def main():
         'bn': 'bn-IN',  # Bengali
     }
 
-    # Default to 'en-IN' if an unsupported language is chosen
     language_code = language_mapping.get(language, 'en-IN')
 
     if choice == '1':
