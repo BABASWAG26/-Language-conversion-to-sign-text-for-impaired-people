@@ -10,7 +10,7 @@ How It Works:
 ● Applications:
 ▪Live captions during meetings, events, and broadcasts.
 ▪Mobile apps for one-on-one conversations.
-
+ 
 2. Speech-to-Sign Conversion
 ● Technology: Combines ASR with sign language animation systems or displays.
 ● Process:
